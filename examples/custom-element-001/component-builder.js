@@ -18,7 +18,13 @@
   
   function mountedBuilder (options, render) {
     return function onMounted () {
-      this.innerHTML = render.call(this); 
+      if (this.children.length > 0) {
+        var templateContainer = document.createElement('div')
+        templateContainer.innerHTML = render.call(this)
+        this.insertBefore(templateContainer.children[0], this.firstChild)
+      } else {
+        this.innerHTML = render.call(this)
+      }
       return options.onMounted ? options.onMounted.call(this) : consoleThis.call(this)
     }
   }

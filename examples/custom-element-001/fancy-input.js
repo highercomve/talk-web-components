@@ -15,7 +15,16 @@
 
   var ComponentProto = Object.create(HTMLElement.prototype)
   ComponentProto.createdCallback = onCreated
-  ComponentProto.attachedCallback = function () { this.innerHTML = TEMPLATE; onMounted.call(this) }
+  ComponentProto.attachedCallback = function () {
+    if (this.children.length > 0) {
+      var templateContainer = document.createElement('div')
+      templateContainer.innerHTML = TEMPLATE
+      this.insertBefore(templateContainer.children[0], this.firstChild)
+    } else {
+      this.innerHTML = TEMPLATE
+    }
+    onMounted.call(this)
+  }
   ComponentProto.detachedCallback = onUnmounted
   ComponentProto.attributeChangedCallback = onChange
 
