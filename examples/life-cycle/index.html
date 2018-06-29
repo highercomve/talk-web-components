@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="./life-cycle.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      // See console for created document
+      var newLyfeCycle = document.createElement('life-cycle')
+
+      // See console message for attachment
+      document.body.appendChild(newLyfeCycle)
+
+      // Change an attribute
+      var element = document.querySelector('life-cycle')
+      element.setAttribute('class', 'update-element-with-class')
+
+      // See console message for this attach
+      document.body.removeChild(element)
+    })
+  </script>
+</head>
+
+<body>
+  <h1>Open your browser console</h1>
+</body>
+
+</html>
