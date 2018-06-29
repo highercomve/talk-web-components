@@ -6,8 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
-  <script src="./life-cycle.js"></script>
   <script>
+
+    (function (document) {
+      var ComponentProto = Object.create(HTMLElement.prototype)
+      ComponentProto.createdCallback = function () {
+        console.log('life-cycle element created but not attached')
+      }
+      ComponentProto.attachedCallback = function () {
+        console.log('life-cycle element attached')
+      }
+      ComponentProto.detachedCallback = function () {
+        console.log('life-cycle element detached')
+      }
+      ComponentProto.attributeChangedCallback = function (attrName, oldValue, newValue) {
+        console.log('life-cycle element attribute Changed')
+        console.log('attrName', attrName)
+        console.log('oldValue', oldValue)
+        console.log('newValue', newValue)
+      }
+
+      document.registerElement('life-cycle', {
+        prototype: ComponentProto
+      })
+    })(document)
+
     document.addEventListener("DOMContentLoaded", function (event) {
       // See console for created document
       var newLyfeCycle = document.createElement('life-cycle')
