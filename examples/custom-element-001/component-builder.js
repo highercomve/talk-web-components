@@ -2,6 +2,7 @@
   function consoleThis () {
     console.log(arguments)
   }
+  
   function clone (obj, list = [], include = true) {
     return Object.keys(obj).reduce((result, key) => {
       if (list.includes(key) === include) {
@@ -10,17 +11,24 @@
       return result
     }, {})
   }
+  
   function emptyTemplate () {
     return `<span>empty template for ${this.tagName}</span>`
   }
+  
   function mountedBuilder (options, render) {
     return function onMounted () {
       this.innerHTML = render.call(this); 
       return options.onMounted ? options.onMounted.call(this) : consoleThis.call(this)
     }
   }
-  window.CreateComponent = function (name = (function () {throw new Error('name is required')}), options = {}) {
-    const render = options.render || emptyTemplate
+  
+  function isRequired (message) {
+    throw new Error(message)
+  }
+
+  window.CreateComponent = function (name = isRequired('name is required'), options = {}) {
+    const render = options.render || emptyTemplate  
     const onMounted = mountedBuilder(options, render)
     const onCreated = options.onCreated || consoleThis
     const onUnmounted = options.onMounted || consoleThis
