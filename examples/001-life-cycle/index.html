@@ -35,8 +35,13 @@
         console.log('life-cycle-es5 element created but not attached')
         return _
       }
+      
+      LifeCycleEs5.prototype = Object.create(HTMLElement.prototype, { 
+        constructor: { value: LifeCycleEs5, enumerable: false, writable: true, configurable: true }
+      })
+      
+      Object.setPrototypeOf ? Object.setPrototypeOf(LifeCycleEs5, HTMLElement) : LifeCycleEs5.__proto__ = HTMLElement;
 
-      LifeCycleEs5.prototype = Object.create(HTMLElement.prototype)
       LifeCycleEs5.prototype.adoptedCallback = function () {
         console.log('life-cycle-es5 element moved to new page.')
       }
