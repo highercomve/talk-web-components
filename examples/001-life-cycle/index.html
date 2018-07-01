@@ -37,9 +37,6 @@
       }
 
       LifeCycleEs5.prototype = Object.create(HTMLElement.prototype)
-      LifeCycleEs5.prototype.observedAttributes = function () {
-        return ['class']
-      }
       LifeCycleEs5.prototype.adoptedCallback = function () {
         console.log('life-cycle-es5 element moved to new page.')
       }
