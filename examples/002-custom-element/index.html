@@ -6,20 +6,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
-  <script src="./fancy-input.js"></script>
   <script src="./component-builder-elementregister.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function(event) {
       CreateComponent('testing-component')
+
+      CreateComponent('hello-component', {
+        render () {
+          console.log(this)
+          return `<p>Hello from component</p>`
+        },
+        observedAttributes () {
+          return ['class']
+        }
+      })
     })
   </script>
 </head>
 
 <body>
-  <fancy-input>
-    <h1>What about</h1>
-  </fancy-input>
   <testing-component></testing-component>
+  <hello-component class="testing"></hello-component>
 </body>
 
 </html>

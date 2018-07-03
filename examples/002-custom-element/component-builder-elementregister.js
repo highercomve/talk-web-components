@@ -1,6 +1,6 @@
 (function (document, window) {
   function consoleThis () {
-    console.log(arguments)
+    console.log(...arguments)
   }
   
   function clone (obj, list = [], include = true) {
@@ -13,48 +13,64 @@
   }
   
   function emptyTemplate () {
-    return `<span>empty template for ${this.tagName}</span>`
+    return `<p>empty template for ${this.tagName}</p>`
   }
   
-  function mountedBuilder (options, render) {
+  function mountedBuilder (options) {
     return function onMounted () {
-      if (this.children.length > 0) {
-        var templateContainer = document.createElement('div')
-        templateContainer.innerHTML = render.call(this)
-        this.insertBefore(templateContainer.children[0], this.firstChild)
-      } else {
-        this.innerHTML = render.call(this)
-      }
+      updateComponent.call(this)
       return options.onMounted ? options.onMounted.call(this) : consoleThis.call(this)
     }
   }
-  
+
+  function updateComponent () {
+    if (this.children.length > 0) {
+      var templateContainer = document.createElement('div')
+      templateContainer.innerHTML = this.render(this)
+      this.insertBefore(templateContainer.children[0], this.firstChild)
+    } else {
+      this.innerHTML = this.render(this)
+    }
+  }
+
   function isRequired (message) {
     throw new Error(message)
   }
 
   window.CreateComponent = function (name = isRequired('name is required'), options = {}) {
-    const render = options.render || emptyTemplate  
-    const onMounted = mountedBuilder(options, render)
-    const onCreated = options.onCreated || consoleThis
-    const onUnmounted = options.onMounted || consoleThis
-    const onChange = options.onMounted || consoleThis
-    const elemMethods = clone(options, ['name', 'onCreated', 'onMounted', 'onUnmounted', 'onChange', 'events'], false)
-    const lifeCycle = {
-      createdCallback: {value: onCreated},
-      attachedCallback: {value: onMounted},
-      detachedCallback: {value: onUnmounted},
-      attributeChangedCallback: {value: onChange}
-    }
-    const protoOptions = Object.assign(elemMethods, lifeCycle)
-    const ComponentProto = Object.create(HTMLElement.prototype, protoOptions)
-
-    document.registerElement(
-      name,
-      {
-        prototype: ComponentProto
-      }
+    const elemMethods = clone(
+      options, 
+      ['name', 'onCreated', 'onMounted', 'onUnmounted', 'onChange', 'events', 'observedAttributes'],
+      false
     )
+
+    function Component () {
+      let _ = Reflect.construct(HTMLElement, [], new.target)
+      this.onCreated.call(_)
+      return _
+    }
+    
+    Component.prototype = Object.create(HTMLElement.prototype, { 
+      constructor: { value: Component, enumerable: false, writable: true, configurable: true }
+    })
+    Component.prototype.render = options.render || emptyTemplate
+    Component.prototype.connectedCallback = mountedBuilder(options)
+    Component.prototype.adoptedCallback = options.onAdopted || updateComponent
+    Component.prototype.attributeChangedCallback = options.onChange || updateComponent
+    Component.prototype.onCreated = options.onCreated || updateComponent
+    Component.prototype.disconnectedCallback = options.onUnmounted || consoleThis
+    Object.assign(Component.prototype, elemMethods)
+
+    if (options.observedAttributes) {
+      Object.defineProperties(Component, {
+        observedAttributes: {
+          configurable: true,
+          get: options.observedAttributes
+        }
+      })
+    }
+
+    customElements.define(name, Component);
   }
 })(document, window)
   
