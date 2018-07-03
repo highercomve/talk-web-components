@@ -36,7 +36,7 @@
   window.CreateComponent = function (name = isRequired('name is required'), options = {}) {
     const elemMethods = clone(
       options, 
-      ['name', 'onCreated', 'onMounted', 'onUnmounted', 'onChange', 'events', 'observedAttributes'],
+      ['onCreated', 'connectedCallback', 'adoptedCallback', 'attributeChangedCallback', 'disconnectedCallback', 'events', 'observedAttributes'],
       false
     )
 
@@ -51,10 +51,10 @@
     })
     Component.prototype.render = options.render || emptyTemplate
     Component.prototype.connectedCallback = mountedBuilder(options)
+    Component.prototype.disconnectedCallback = options.disconnectedCallback || consoleThis
     Component.prototype.adoptedCallback = options.adoptedCallback || updateComponent
     Component.prototype.attributeChangedCallback = options.attributeChangedCallback || updateComponent
     Component.prototype.onCreated = options.onCreated || updateComponent
-    Component.prototype.disconnectedCallback = options.disconnectedCallback || consoleThis
     Object.assign(Component.prototype, elemMethods)
 
     if (options.observedAttributes) {
