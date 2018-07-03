@@ -8,22 +8,32 @@
   <title>Document</title>
   <script>
 
+    function showMessage () {
+      var newMessage = document.createElement('div')
+      var message = Array.from(arguments).join(', ')
+      newMessage.innerHTML = `
+        <span style="color: red">${message}</span>
+      `
+      console.log(...arguments)
+      document.body.appendChild(newMessage)
+    }
+
     (function (document) {
       var ComponentProto = Object.create(HTMLElement.prototype)
       ComponentProto.createdCallback = function () {
-        console.log('life-cycle element created but not attached')
+        showMessage('life-cycle element created but not attached')
       }
       ComponentProto.attachedCallback = function () {
-        console.log('life-cycle element attached')
+        showMessage('life-cycle element attached')
       }
       ComponentProto.detachedCallback = function () {
-        console.log('life-cycle element detached')
+        showMessage('life-cycle element detached')
       }
       ComponentProto.attributeChangedCallback = function (attrName, oldValue, newValue) {
-        console.log('life-cycle element attribute Changed')
-        console.log('attrName', attrName)
-        console.log('oldValue', oldValue)
-        console.log('newValue', newValue)
+        showMessage('life-cycle element attribute Changed')
+        showMessage('attrName', attrName)
+        showMessage('oldValue', oldValue)
+        showMessage('newValue', newValue)
       }
 
       document.registerElement('life-cycle', {
@@ -32,7 +42,7 @@
 
       function LifeCycleEs5 () {
         let _ = Reflect.construct(HTMLElement, [], new.target)
-        console.log('life-cycle-es5 element created but not attached')
+        showMessage('life-cycle-es5 element created but not attached')
         return _
       }
       
@@ -43,19 +53,19 @@
       Object.setPrototypeOf ? Object.setPrototypeOf(LifeCycleEs5, HTMLElement) : LifeCycleEs5.__proto__ = HTMLElement;
 
       LifeCycleEs5.prototype.adoptedCallback = function () {
-        console.log('life-cycle-es5 element moved to new page.')
+        showMessage('life-cycle-es5 element moved to new page.')
       }
       LifeCycleEs5.prototype.connectedCallback = function () {
-        console.log('life-cycle-es5 element attached')
+        showMessage('life-cycle-es5 element attached')
       }
       LifeCycleEs5.prototype.disconnectedCallback = function () {
-        console.log('life-cycle-es5 element detached')
+        showMessage('life-cycle-es5 element detached')
       }
       LifeCycleEs5.prototype.attributeChangedCallback = function (attrName, oldValue, newValue) {
-        console.log('life-cycle-es5 element attribute Changed')
-        console.log('attrName', attrName)
-        console.log('oldValue', oldValue)
-        console.log('newValue', newValue)
+        showMessage('life-cycle-es5 element attribute Changed')
+        showMessage('attrName', attrName)
+        showMessage('oldValue', oldValue)
+        showMessage('newValue', newValue)
       }
 
       Object.defineProperties(LifeCycleEs5, {
@@ -72,27 +82,27 @@
         static get observedAttributes() { return ['class']; }
 
         constructor () {
-          super()
-          console.log('LifeCycle2 created')
+          super()  
+          showMessage('LifeCycle2 created')
         }
 
-        connectedCallback () {
-          console.log('LifeCycle2 element added to page.');
+        connectedCallback () {  
+          showMessage('LifeCycle2 element added to page.');
         }
 
-        disconnectedCallback () {
-          console.log('LifeCycle2 element removed from page..');
+        disconnectedCallback () {  
+          showMessage('LifeCycle2 element removed from page..');
         }
 
-        adoptedCallback () {
-          console.log('LifeCycle2 element moved to new page.');
+        adoptedCallback () {  
+          showMessage('LifeCycle2 element moved to new page.');
         }
 
-        attributeChangedCallback (attrName, oldValue, newValue) {
-          console.log('life-cycle element attribute Changed')
-          console.log('attrName', attrName)
-          console.log('oldValue', oldValue)
-          console.log('newValue', newValue)
+        attributeChangedCallback (attrName, oldValue, newValue) {  
+          showMessage('LifeCycle2 element attribute Changed')  
+          showMessage('attrName', attrName)  
+          showMessage('oldValue', oldValue)  
+          showMessage('newValue', newValue)
         }
       }
 
