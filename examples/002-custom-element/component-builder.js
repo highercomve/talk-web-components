@@ -26,13 +26,7 @@
   }
 
   function updateComponent () {
-    if (this.children.length > 0) {
-      var templateContainer = document.createElement('div')
-      templateContainer.innerHTML = this.render(this)
-      this.insertBefore(templateContainer.children[0], this.firstChild)
-    } else {
-      this.innerHTML = this.render(this)
-    }
+    this.innerHTML = this.render(this)
   }
 
   function isRequired (message) {
