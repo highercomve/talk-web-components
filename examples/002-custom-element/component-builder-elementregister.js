@@ -19,7 +19,9 @@
   function mountedBuilder (options) {
     return function onMounted () {
       updateComponent.call(this)
-      return options.onMounted ? options.onMounted.call(this) : consoleThis.call(this)
+      return options.connectedCallback
+        ? options.connectedCallback.call(this)
+        : consoleThis.call(this)
     }
   }
 
@@ -55,10 +57,10 @@
     })
     Component.prototype.render = options.render || emptyTemplate
     Component.prototype.connectedCallback = mountedBuilder(options)
-    Component.prototype.adoptedCallback = options.onAdopted || updateComponent
-    Component.prototype.attributeChangedCallback = options.onChange || updateComponent
+    Component.prototype.adoptedCallback = options.adoptedCallback || updateComponent
+    Component.prototype.attributeChangedCallback = options.attributeChangedCallback || updateComponent
     Component.prototype.onCreated = options.onCreated || updateComponent
-    Component.prototype.disconnectedCallback = options.onUnmounted || consoleThis
+    Component.prototype.disconnectedCallback = options.disconnectedCallback || consoleThis
     Object.assign(Component.prototype, elemMethods)
 
     if (options.observedAttributes) {
