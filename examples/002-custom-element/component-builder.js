@@ -1,4 +1,4 @@
-(function (document, window) {
+(function (window) {
   function consoleThis () {
     console.log(...arguments)
   }
@@ -36,7 +36,7 @@
   window.CreateComponent = function (name = isRequired('name is required'), options = {}) {
     const elemMethods = clone(
       options, 
-      ['onCreated', 'connectedCallback', 'adoptedCallback', 'attributeChangedCallback', 'disconnectedCallback', 'events', 'observedAttributes'],
+      ['onCreated', 'connectedCallback', 'adoptedCallback', 'attributeChangedCallback', 'disconnectedCallback', 'observedAttributes'],
       false
     )
 
@@ -68,5 +68,5 @@
 
     customElements.define(name, Component);
   }
-})(document, window)
+})(window)
   
