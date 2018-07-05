@@ -80,10 +80,9 @@
 
   function updateComponent() {
     this.template.innerHTML = `<div>${this.render(this)}</div>`
-    newContent = this.template.content.cloneNode(true).children[0]
-    lastContent = this.children[0]
-    lastHtml = this.innerHTML
-    if (this.template.innerHTML !== lastHtml) {
+    const newContent = this.template.content.cloneNode(true).children[0]
+    const lastContent = this.children[0]
+    if (this.template.innerHTML !== this.innerHTML) {
       updateElement(this, newContent, lastContent)
     }
   }
