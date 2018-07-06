@@ -1,5 +1,5 @@
 export default class GiphyApi {
-  constructor(apiKey) {
+  constructor (apiKey) {
     if (!apiKey) {
       throw new Error('apiKey must be provided.');
     }
@@ -7,7 +7,7 @@ export default class GiphyApi {
     this.apiKey = apiKey;
   }
 
-  async search(search, limit = 10, offset = 0, rating = 'G', lang = 'en') {
+  async search (search, limit = 10, offset = 0, rating = 'G', lang = 'en') {
     if (!search) {
       throw new Error('search must be provided.');
     }
