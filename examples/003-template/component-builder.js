@@ -108,6 +108,12 @@
     }
   }
 
+  function onChange (name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      updateComponent.call(this)
+    }
+  }
+
   function isRequired(message) {
     throw new Error(message)
   }
@@ -141,7 +147,7 @@
     Component.prototype.connectedCallback = mountedBuilder(options)
     Component.prototype.disconnectedCallback = options.disconnectedCallback || consoleThis
     Component.prototype.adoptedCallback = options.adoptedCallback || updateComponent
-    Component.prototype.attributeChangedCallback = options.attributeChangedCallback || updateComponent
+    Component.prototype.attributeChangedCallback = options.attributeChangedCallback || onChange
     Component.prototype.onCreated = options.onCreated || updateComponent
 
     Object.keys(elemMethods).forEach((key) => {
