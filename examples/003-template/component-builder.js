@@ -1,13 +1,33 @@
 (function (window) {
   'use strict';
   const TEXT_NODE = 3
+  const ELEMENT_NODE = 1
+  
+  function updateAttributes (node1, node2) {
+    if (node1.nodeType !== ELEMENT_NODE || node1.nodeType !== ELEMENT_NODE) {
+      return
+    }
+    const node1Attributes = node1.getAttributeNames().sort()
+    const node2Attributes = node2.getAttributeNames().sort()
+    const newLength = node1Attributes.length
+    const oldLength = node2Attributes.length
+    for (let i = 0; i < newLength || i < oldLength; i++) {
+      const attr1Name = node1Attributes[i]
+      const attr2Name = node2Attributes[i]
+      if (!attr2Name || attr1Name === attr1Name) {
+        node2.setAttribute(attr1Name, node1.getAttribute(attr1Name))
+      }
+      if (!attr1Name) {
+        node2.removeAttribute(attr2Name)
+      }
+    }
+  }
 
   function changed(node1, node2) {
     return typeof node1 !== typeof node2 ||
       typeof node1 === 'string' && node1 !== node2 ||
       node1.nodeType === TEXT_NODE && node1.textContent !== node2.textContent ||
-      node1.type !== node2.type ||
-      node1.innerHtml !== node2.innerHtml
+      node1.nodeType !== node2.nodeType 
   }
 
   function updateElement ($parent, newNode, oldNode, index = 0) {
@@ -27,6 +47,7 @@
     } else if (newNode) {
       const newLength = newNode.childNodes.length;
       const oldLength = oldNode.childNodes.length;
+      updateAttributes(newNode, oldNode)
       for (let i = 0; i < newLength || i < oldLength; i++) {
         updateElement(
           $parent.childNodes[index],

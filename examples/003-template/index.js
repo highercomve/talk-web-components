@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     render () {
       return `
         <p>Hello ${this.counter} from component</p>
-        <button>count!</button>
+        <button data-number="${this.counter}">count!</button>
       `
     },
     count () {
