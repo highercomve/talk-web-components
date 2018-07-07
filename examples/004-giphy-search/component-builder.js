@@ -27,10 +27,18 @@
     return typeof node1 !== typeof node2 ||
       typeof node1 === 'string' && node1 !== node2 ||
       node1.nodeType === TEXT_NODE && node1.textContent !== node2.textContent ||
-      node1.nodeType !== node2.nodeType 
+      node1.nodeType !== node2.nodeType
+  }
+
+  function emptyTextNode (node) {
+    return node && node.nodeType === TEXT_NODE && node.nodeValue.trim() === ''
   }
 
   function updateElement ($parent, newNode, oldNode, index = 0) {
+    // debugger
+    if ((!oldNode && !newNode) || (emptyTextNode(newNode) && emptyTextNode(oldNode))) {
+      return
+    }
     if (!oldNode) {
       $parent.appendChild(
         newNode
@@ -48,11 +56,13 @@
       const newLength = newNode.childNodes.length;
       const oldLength = oldNode.childNodes.length;
       updateAttributes(newNode, oldNode)
+      const newChildren = [...newNode.childNodes]
+      const oldChildren = [...oldNode.childNodes]
       for (let i = 0; i < newLength || i < oldLength; i++) {
         updateElement(
           $parent.childNodes[index],
-          newNode.childNodes[i],
-          oldNode.childNodes[i],
+          newChildren[i],
+          oldChildren[i],
           i
         );
       }
@@ -100,7 +110,10 @@
   }
 
   function updateComponent () {
-    this.template.innerHTML = `<div>${this.render(this)}</div>`
+    const renderTxt = this.render(this)
+      .replace( /[\s]+/g, ' ' )
+      .replace(/[\n\r]+/g, '')
+    this.template.innerHTML = `<div>${renderTxt}</div>`
     const newContent = this.template.content.cloneNode(true).children[0]
     const lastContent = this.children[0]
     if (this.template.innerHTML !== this.innerHTML) {
@@ -137,6 +150,7 @@
       let _ = Reflect.construct(HTMLElement, [], new.target)
       _.template = document.createElement('template')
       _.onCreated.call(_)
+      _.updateComponent.call(_)
       return _
     }
 
@@ -146,10 +160,11 @@
     Component.prototype.render = options.render || emptyTemplate
     Component.prototype.connectedCallback = mountedBuilder(options)
     Component.prototype.disconnectedCallback = options.disconnectedCallback || consoleThis
-    Component.prototype.adoptedCallback = options.adoptedCallback || updateComponent
     Component.prototype.attributeChangedCallback = options.attributeChangedCallback || onChange
-    Component.prototype.onCreated = options.onCreated || updateComponent
+    Component.prototype.adoptedCallback = options.adoptedCallback || consoleThis
+    Component.prototype.onCreated = options.onCreated || consoleThis
     Component.prototype.updateComponent = updateComponent
+    Component.prototype.onChange = onChange
 
     Object.keys(elemMethods).forEach((key) => {
       const descriptorKeys = ['configurable', 'enumerable', 'value', 'writable', 'get', 'set']
@@ -161,11 +176,9 @@
       }
     })
     if (options.observedAttributes) {
-      Object.defineProperties(Component, {
-        observedAttributes: {
-          configurable: true,
-          get: options.observedAttributes
-        }
+      Object.defineProperty(Component.prototype, 'observedAttributes', {
+        configurable: true,
+        get: options.observedAttributes
       })
     }
 

@@ -5,8 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+  <script src="./component-builder.js"></script>
+  <script src="./index.js"></script>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    giphy-search {
+      display: block;
+    }
+    giphy-search input {
+      font-size: 1.2em;
+      padding: 0.5em 1em;
+      margin-bottom: 1em;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    giphy-search .giphy-search__results {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+      align-content: flex-start;
+    }
+    giphy-search .giphy-search__results .giphy-search__gif {
+      flex: auto;
+      height: 200px;
+    }
+    giphy-search .giphy-search__results .giphy-search__gif img {
+      width: auto;
+      max-height: 200px;
+    }
+  </style>
 </head>
 <body>
-  
+  <giphy-search api-key="NilCckKtrJq9lDxMICbF7SrJTAN2wABk"></giphy-search>
 </body>
 </html>
