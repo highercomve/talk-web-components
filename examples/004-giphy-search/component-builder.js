@@ -35,7 +35,6 @@
   }
 
   function updateElement ($parent, newNode, oldNode, index = 0) {
-    // debugger
     if ((!oldNode && !newNode) || (emptyTextNode(newNode) && emptyTextNode(oldNode))) {
       return
     }
@@ -87,20 +86,29 @@
   }
 
   function setEvents (events) {
+    this.listeners = []
     Object.keys(events || {}).forEach((key) => {
       const type = key.split(/\ (.+)/)[0]
       const selector = key.split(/\ (.+)/)[1]
       const cb = events[key]
-      this.addEventListener(type, function (event) {
+      const eventFunction = function (event) {
         if (event.target && event.target.matches(selector)) {
           cb.call(this, ...arguments)
         }
-      })
+      }
+      this.listeners.push({ type, eventFunction })
+      this.addEventListener(type, eventFunction)
     })
   }
 
-  function mountedBuilder (options) {
-    return function onMounted() {
+  function unSetEvents () {
+    this.listeners.forEach((listener) => {
+      this.removeEventListener(listener.type, listener.eventFunction)
+    })
+  }
+
+  function mountedWrapper (options) {
+    return function onMounted () {
       updateComponent.call(this)
       setEvents.call(this, options.events)
       return options.connectedCallback
@@ -111,7 +119,6 @@
 
   function updateComponent () {
     const renderTxt = this.render(this)
-      .replace( /[\s]+/g, ' ' )
       .replace(/[\n\r]+/g, '')
     this.template.innerHTML = `<div>${renderTxt}</div>`
     const newContent = this.template.content.cloneNode(true).children[0]
@@ -124,6 +131,15 @@
   function onChange (name, oldValue, newValue) {
     if (oldValue !== newValue) {
       updateComponent.call(this)
+    }
+  }
+
+  function disconnectedWrapper (cb) {
+    return function disconnectedCallback () {
+      unSetEvents.call(this)
+      if (cb) {
+        cb.call(this)
+      }
     }
   }
 
@@ -158,8 +174,8 @@
       constructor: { value: Component, enumerable: false, writable: true, configurable: true }
     })
     Component.prototype.render = options.render || emptyTemplate
-    Component.prototype.connectedCallback = mountedBuilder(options)
-    Component.prototype.disconnectedCallback = options.disconnectedCallback || consoleThis
+    Component.prototype.connectedCallback = mountedWrapper(options)
+    Component.prototype.disconnectedCallback = disconnectedWrapper(options.disconnectedCallback || consoleThis)
     Component.prototype.attributeChangedCallback = options.attributeChangedCallback || onChange
     Component.prototype.adoptedCallback = options.adoptedCallback || consoleThis
     Component.prototype.onCreated = options.onCreated || consoleThis
@@ -176,7 +192,7 @@
       }
     })
     if (options.observedAttributes) {
-      Object.defineProperty(Component.prototype, 'observedAttributes', {
+      Object.defineProperty(Component, 'observedAttributes', {
         configurable: true,
         get: options.observedAttributes
       })
