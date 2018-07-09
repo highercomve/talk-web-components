@@ -42,16 +42,22 @@
       $parent.appendChild(
         newNode
       );
-    } else if (!newNode) {
+      return
+    }
+    if (!newNode) {
       $parent.removeChild(
         $parent.childNodes[index]
       );
-    } else if (changed(newNode, oldNode)) {
+      return
+    }
+    if (changed(newNode, oldNode)) {
       $parent.replaceChild(
         newNode,
         $parent.childNodes[index]
       );
-    } else if (newNode) {
+      return
+    } 
+    if (newNode) {
       const newLength = newNode.childNodes.length;
       const oldLength = oldNode.childNodes.length;
       updateAttributes(newNode, oldNode)
@@ -108,7 +114,7 @@
   }
 
   function mountedWrapper (options) {
-    return function onMounted() {
+    return function onMounted () {
       updateComponent.call(this)
       setEvents.call(this, options.events)
       return options.connectedCallback
@@ -135,9 +141,11 @@
   }
 
   function disconnectedWrapper (cb) {
-    unSetEvents.call(this)
-    if (cb) {
-      cb.call(this)
+    return function disconnectedCallback () {
+      unSetEvents.call(this)
+      if (cb) {
+        cb.call(this)
+      }
     }
   }
 

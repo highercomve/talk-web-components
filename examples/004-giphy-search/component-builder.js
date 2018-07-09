@@ -2,6 +2,10 @@
   'use strict';
   const TEXT_NODE = 3
   const ELEMENT_NODE = 1
+
+  function consoleThis () {
+    console.log(...arguments)
+  }
   
   function updateAttributes (node1, node2) {
     if (node1.nodeType !== ELEMENT_NODE || node1.nodeType !== ELEMENT_NODE) {
@@ -34,6 +38,10 @@
     return node && node.nodeType === TEXT_NODE && node.nodeValue.trim() === ''
   }
 
+  function isTypeOfComponentBuilder (node) {
+    return node && node.localName.split('-').length > 1
+  }
+
   function updateElement ($parent, newNode, oldNode, index = 0) {
     if ((!oldNode && !newNode) || (emptyTextNode(newNode) && emptyTextNode(oldNode))) {
       return
@@ -42,16 +50,26 @@
       $parent.appendChild(
         newNode
       );
-    } else if (!newNode) {
+      return
+    }
+    if (!newNode) {
       $parent.removeChild(
         $parent.childNodes[index]
       );
-    } else if (changed(newNode, oldNode)) {
+      return
+    }
+    if (isTypeOfComponentBuilder(newNode) && isTypeOfComponentBuilder(oldNode)) {
+      updateAttributes(newNode, oldNode)
+      return
+    }
+    if (changed(newNode, oldNode)) {
       $parent.replaceChild(
         newNode,
         $parent.childNodes[index]
       );
-    } else if (newNode) {
+      return
+    }
+    if (newNode) {
       const newLength = newNode.childNodes.length;
       const oldLength = oldNode.childNodes.length;
       updateAttributes(newNode, oldNode)
@@ -66,10 +84,6 @@
         );
       }
     }
-  }
-
-  function consoleThis () {
-    console.log(...arguments)
   }
 
   function clone (obj, list = [], include = true) {
@@ -175,12 +189,13 @@
     })
     Component.prototype.render = options.render || emptyTemplate
     Component.prototype.connectedCallback = mountedWrapper(options)
-    Component.prototype.disconnectedCallback = disconnectedWrapper(options.disconnectedCallback || consoleThis)
+    Component.prototype.disconnectedCallback = disconnectedWrapper(options.disconnectedCallback || consoleThis.bind(null, 'disconnectedCallback'))
     Component.prototype.attributeChangedCallback = options.attributeChangedCallback || onChange
-    Component.prototype.adoptedCallback = options.adoptedCallback || consoleThis
-    Component.prototype.onCreated = options.onCreated || consoleThis
+    Component.prototype.adoptedCallback = options.adoptedCallback || consoleThis.bind(null, 'adoptedCallback')
+    Component.prototype.onCreated = options.onCreated || consoleThis.bind(null, 'onCreated')
     Component.prototype.updateComponent = updateComponent
     Component.prototype.onChange = onChange
+    Component.prototype.cbName = name
 
     Object.keys(elemMethods).forEach((key) => {
       const descriptorKeys = ['configurable', 'enumerable', 'value', 'writable', 'get', 'set']
