@@ -115,12 +115,14 @@
       }
       this.listeners.push({ type, eventFunction })
       this.shadowRoot.addEventListener(type, eventFunction.bind(this))
+      this.addEventListener(type, eventFunction.bind(this))
     })
   }
 
   function unSetEvents () {
     this.listeners.forEach((listener) => {
       this.shadowRoot.removeEventListener(listener.type, listener.eventFunction)
+      this.removeEventListener(listener.type, listener.eventFunctio)
     })
   }
 
