@@ -1,0 +1,43 @@
+<script src="./component-builder.js"></script>
+
+<template id="giphy-element-template">
+  <style>
+    :host {
+      display: flex;
+      flex: auto;
+      height: 200px;
+      overflow: hidden;
+    }
+    :host ::slotted(img) {
+      width: auto;
+      max-height: 200px;
+    }
+  </style>
+  <div class="giphy-search__gif">
+    <slot></slot>
+  </div>
+</template>
+<script>
+'use strict';
+(function () {
+const thisDoc = document.currentScript.ownerDocument;
+const GiphyElement = {
+    src: {
+      get () {
+        return this.getAttribute('src') || ''
+      }
+    },
+    template: thisDoc.querySelector('template'),
+    render () {
+      return `<img src="${this.src}" />`
+    },
+    events: {},
+    observedAttributes () {
+      return ['src']
+    }
+  }
+window.addEventListener('WebComponentsReady', function(e) {
+  CreateComponent('giphy-element', GiphyElement)
+})
+})()
+</script>

@@ -47,8 +47,12 @@ const GiphySearch = {
     <style>
         :host {
           display: block;
+          contain: content; /* CSS containment FTW. */
         }
-        :host input {
+        :host-content(.dark) {
+          background-color: black;
+        }
+        :host .giphy-search__input {
           font-size: 1.2em;
           padding: 0.5em 1em;
           margin-bottom: 1em;
@@ -64,27 +68,27 @@ const GiphySearch = {
           align-items: flex-start;
           align-content: flex-start;
         }
-        :host .giphy-search__results .giphy-search__gif {
-          flex: auto;
-          height: 200px;
-        }
-        :host .giphy-search__results .giphy-search__gif img {
-          width: auto;
-          max-height: 200px;
+        :host .giphy-search__results ::slotted(div) {
+          display: flex;
+          flex-wrap: wrap;
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: flex-start;
+          align-content: flex-start;
         }
       </style>
-      <div data-render></div>
+      <form action="#">
+        <input class="giphy-search__input" placeholder="What you want to search?" />
+      </form>
+      <div class="giphy-search__results">
+        <slot>
+        </slot>
+      </div>
     `,
   render () {
-    const images = this.results.map((result) => {
+    return this.results.map((result) => {
       return `<giphy-element src="${result.images.original.url}"></giphy-element>`
     }).join('')
-    return `
-      <form action="#">
-        <input placeholder="What you want to search?" />
-      </form>
-      <div class="giphy-search__results">${images}</div>
-    `
   },
   search (search, offset = 0, limit) {
     this.GiphyApi.search(search, offset, limit)
@@ -116,12 +120,25 @@ const GiphyElement = {
       return this.getAttribute('src') || ''
     }
   },
+  template: `
+    <style>
+      :host {
+        display: flex;
+        flex: auto;
+        height: 200px;
+        overflow: hidden;
+      }
+      :host ::slotted(img) {
+        width: auto;
+        max-height: 200px;
+      }
+    </style>
+    <div class="giphy-search__gif">
+      <slot></slot>
+    </div>
+  `,
   render () {
-    return `
-      <div class="giphy-search__gif">
-        <img src="${this.src}" />
-      </div>
-    `
+    return `<img src="${this.src}" />`
   },
   events: {},
   observedAttributes () {

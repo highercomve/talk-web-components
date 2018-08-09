@@ -120,7 +120,7 @@
 
   function unSetEvents () {
     this.listeners.forEach((listener) => {
-      this.removeEventListener(listener.type, listener.eventFunction)
+      this.shadowRoot.removeEventListener(listener.type, listener.eventFunction)
     })
   }
 
@@ -184,7 +184,7 @@
       _.renderTemplate = document.createElement('template')
       _.attachShadow({mode: 'open'})
       if (options.template && options.template.nodeType) {
-        _.shadowRoot.appendChild = options.template.content.cloneNode(true)
+        _.shadowRoot.appendChild(options.template.content.cloneNode(true))
       } else {
         _.shadowRoot.innerHTML = (options.template || '<slot></slot>').replace(/[\n\r]+/g, '')
       }
@@ -208,7 +208,9 @@
 
     Object.keys(elemMethods).forEach((key) => {
       const descriptorKeys = ['configurable', 'enumerable', 'value', 'writable', 'get', 'set']
-      const isDescriptor = Object.keys(elemMethods[key]).some((key) => descriptorKeys.includes(key))
+      const isDescriptor = elemMethods[key] &&
+                            typeof elemMethods[key] === 'object' &&
+                            Object.keys(elemMethods[key]).some((key) => descriptorKeys.includes(key))
       if (isDescriptor) {
         Object.defineProperty(Component.prototype, key, elemMethods[key])
       } else {
