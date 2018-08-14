@@ -137,11 +137,11 @@
   }
 
   function updateComponent () {
-    const newContent = document.createElement('div')
     const renderTxt = this.render(this).replace(/[\n\r]+/g, '')
-    newContent.innerHTML = renderTxt
-    if (!this.children[0] || newContent.children[0].innerHTML !== this.children[0].innerHTML) {
-      updateElement(this, newContent.children[0], this.children[0])
+    if (!this.children[0] || renderTxt !== this.children[0].innerHTML) {
+      const newContent = document.createElement('div')
+      newContent.innerHTML = renderTxt
+      updateElement(this, newContent, this.children[0])
     }
   }
 
