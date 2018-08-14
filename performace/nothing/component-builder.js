@@ -137,15 +137,12 @@
   }
 
   function updateComponent () {
+    const newContent = document.createElement('div')
     const renderTxt = this.render(this).replace(/[\n\r]+/g, '')
-    this.renderTemplate.innerHTML = `<div>${renderTxt}</div>`
-    const container = this
-    const newContent = this.renderTemplate.content.cloneNode(true).children[0]
-    const lastContent = container.children[0]
-    if (!lastContent || newContent.innerHTML !== lastContent.innerHTML) {
-      updateElement(container, newContent, lastContent)
+    newContent.innerHTML = renderTxt
+    if (!this.children[0] || newContent.children[0].innerHTML !== this.children[0].innerHTML) {
+      updateElement(this, newContent.children[0], this.children[0])
     }
-    this.renderTemplate.innerHTML = ''
   }
 
   function onChange (name, oldValue, newValue) {
@@ -184,7 +181,6 @@
 
     function Component() {
       let _ = Reflect.construct(HTMLElement, [], new.target)
-      _.renderTemplate = document.createElement('template')
       _.attachShadow({mode: 'open'})
       if (options.template && options.template.nodeType) {
         _.shadowRoot.appendChild(options.template.content.cloneNode(true))
