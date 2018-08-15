@@ -7,83 +7,6 @@
   function consoleThis () {
     console.log(...arguments)
   }
-  
-  function updateAttributes (node1, node2) {
-    if (node1.nodeType !== ELEMENT_NODE || node1.nodeType !== ELEMENT_NODE) {
-      return
-    }
-    const node1Attributes = node1.getAttributeNames().sort()
-    const node2Attributes = node2.getAttributeNames().sort()
-    const newLength = node1Attributes.length
-    const oldLength = node2Attributes.length
-    for (let i = 0; i < newLength || i < oldLength; i++) {
-      const attr1Name = node1Attributes[i]
-      const attr2Name = node2Attributes[i]
-      if (!attr2Name || attr1Name === attr1Name) {
-        node2.setAttribute(attr1Name, node1.getAttribute(attr1Name))
-      }
-      if (!attr1Name) {
-        node2.removeAttribute(attr2Name)
-      }
-    }
-  }
-
-  function changed (node1, node2) {
-    return typeof node1 !== typeof node2 ||
-      typeof node1 === 'string' && node1 !== node2 ||
-      node1.nodeType === TEXT_NODE && node1.textContent !== node2.textContent ||
-      node1.nodeType !== node2.nodeType
-  }
-
-  function emptyTextNode (node) {
-    return node && node.nodeType === TEXT_NODE && node.nodeValue.trim() === ''
-  }
-
-  function isTypeOfComponentBuilder (node) {
-    return node && node.localName && node.localName.split('-').length > 1
-  }
-
-  function updateElement ($parent, newNode, oldNode, index = 0) {
-    const notUpdate = (!oldNode && !newNode) 
-                      || (emptyTextNode(newNode) && emptyTextNode(oldNode)) 
-    if (notUpdate) {
-      return
-    }
-    if (!oldNode) {
-      $parent.appendChild(
-        newNode
-      );
-      return
-    }
-    if (!newNode) {
-      $parent.removeChild(
-        $parent.childNodes[index]
-      );
-      return
-    }
-    if (isTypeOfComponentBuilder(newNode) && isTypeOfComponentBuilder(oldNode)) {
-      updateAttributes(newNode, oldNode)
-      return
-    }
-    if (changed(newNode, oldNode)) {
-      $parent.replaceChild(
-        newNode,
-        $parent.childNodes[index]
-      );
-      return
-    }
-    if (newNode) {
-      updateAttributes(newNode, oldNode)
-      for (let i = 0; i < newNode.childNodes.length || i < oldNode.childNodes.length; i++) {
-        updateElement(
-          $parent.childNodes[index],
-          newNode.childNodes[i],
-          oldNode.childNodes[i],
-          i
-        );
-      }
-    }
-  }
 
   function clone (obj, list = [], include = true) {
     return Object.keys(obj).reduce((result, key) => {
@@ -125,7 +48,6 @@
   function mountedWrapper (options) {
     return function onMounted () {
       updateComponent.call(this)
-      setEvents.call(this, options.events)
       return options.connectedCallback
         ? options.connectedCallback.call(this)
         : consoleThis.call(this)
@@ -133,12 +55,7 @@
   }
 
   function updateComponent () {
-    const renderTxt = this.render(this).replace(/[\n\r]+/g, '')
-    if (!this.children[0] || renderTxt !== this.children[0].innerHTML) {
-      const newContent = document.createElement('div')
-      newContent.innerHTML = renderTxt
-      updateElement(this, newContent, this.children[0])
-    }
+    return this.render(this)
   }
 
   function onChange (name, oldValue, newValue) {
@@ -149,7 +66,6 @@
 
   function disconnectedWrapper (cb) {
     return function disconnectedCallback () {
-      unSetEvents.call(this)
       if (cb) {
         cb.call(this)
       }
@@ -183,6 +99,7 @@
       } else if (options.template) {
         _.shadowRoot.innerHTML = (options.template).replace(/[\n\r]+/g, '')
       }
+      _.hyper = hyperHTML.bind(_)
       _.onCreated.call(_)
       return _
     }
