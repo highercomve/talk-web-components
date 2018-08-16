@@ -135,9 +135,8 @@
   function updateComponent () {
     const renderTxt = this.render(this).replace(/[\n\r]+/g, '')
     if (!this.children[0] || renderTxt !== this.children[0].innerHTML) {
-      const newContent = document.createElement('div')
-      newContent.innerHTML = renderTxt
-      updateElement(this, newContent, this.children[0])
+      this.renderTmpl.innerHTML = `<div>${renderTxt}</div>`
+      updateElement(this, this.renderTmpl.content.cloneNode(true).children[0], this.children[0])
     }
   }
 
@@ -177,6 +176,7 @@
 
     function Component() {
       let _ = Reflect.construct(HTMLElement, [], new.target)
+      _.renderTmpl = document.createElement('template')
       if (options.template) _.attachShadow({mode: 'open'})
       if (options.template && options.template.nodeType) {
         _.shadowRoot.appendChild(options.template.content.cloneNode(true))
